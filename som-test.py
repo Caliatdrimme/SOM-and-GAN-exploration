@@ -9,6 +9,8 @@ from minisom import MiniSom
 
 import matplotlib.pyplot as plt
 
+import statistics
+
 import os
 import glob
 from PIL import Image
@@ -207,9 +209,17 @@ def combined_data():
 
 def compare(real, fake):
    print("here")
-   metric = 0
+   res = []
+   for i in range(0, len(real)):
+      s1 = set(real[i])
+      s2 = set(fake[i])
+      res.append(len(s1.intersection(s2))/len(s1.union(s2)))
+      
+   print("mean Jaccard similiarity: " + str(statistics.mean(res)))
+   print("median Jaccard similiarity: " + str(statistics.median(res)))
+   #print("mode Jaccard similiarity: " + str(statistics.mode(res)))
    
-   return metric
+   return res
 
    
 read_data() 
@@ -259,7 +269,7 @@ for i in range(0, int(size/2)):
    if int(i+50) in res[i]:
       sum = sum + 1
       
-print(str(sum) +  " pairs were grouped together out of " + str(size))
+print(str(sum) +  " pairs were grouped together out of " + str(int(size/2)))
          
          
 
