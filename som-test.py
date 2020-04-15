@@ -44,36 +44,194 @@ fake_list = []
 #store name files 
 legend_fake = []
 legend_real = []
-for filename in glob.glob('horse2zebra/*.png'): 
-    im=Image.open(filename)
-    im.load()
-    data = np.asarray(im, dtype= "int32")
-    if "real" in filename:
-       real_list.append(data.flatten())
-       legend_real.append(filename)
-    if "fake" in filename:
-      fake_list.append(data.flatten())
-      legend_fake.append(filename)
-         
 
+dataset = "horse2zebra/*.png"
+
+def read_data():
+   print("results for dataset " + dataset)
+   for filename in glob.glob(dataset): 
+       im=Image.open(filename)
+       im.load()
+       data = np.asarray(im, dtype= "int32")
+       filename = filename[22:-4]
+       if "real" in filename:
+          real_list.append(data.flatten())
+          legend_real.append(filename)
+       if "fake" in filename:
+         fake_list.append(data.flatten())
+         legend_fake.append(filename)
+            
+def real_data(): 
+   data = real
+   
+   #parameter for som training is number of iterations, should be comparable to number of samples for best results
+   iteration = len(data)
+   #train som
+   som = MiniSom(5, 5, pixels, sigma=0.5, learning_rate=0.5)
+   som.random_weights_init(data)
+   som.train_random(data, iteration)
+   
+   #plt.pcolor(som.distance_map().T, cmap='bone_r')
+   
+   #show some results
+   
+   print("results for real data\n")
+   
+   plt.figure(figsize=(8, 7))
+   frequencies = som.activation_response(data)
+   plt.pcolor(frequencies.T, cmap='Blues') 
+   plt.colorbar()
+   plt.show()
+   
+   act = som.activation_response(data)
+   #print(act)
+   
+   #print(som.quantization_error(data))
+   
+   #print(som.topographic_error(data))
+   
+   #print(som.winner(data[1]))
+   #som.labels_map(data, legend_real)
+   results = []
+   size = len(data)
+   
+   for i in range(0,size):
+      results.append(som.winner(data[i]))
+
+   pairs = []
+   for i in range(0, size):
+      pairs.append([])
+      for j in range(0, size):
+         if results[i]==results[j]:
+            pairs[i].append(j)
+
+   return pairs
+
+#figure out runtime error for quan error
+#better code structure for more tests
+#saving results
+#same initial weights??
+   
+def fake_data():
+   data = fake
+   
+   #parameter for som training is number of iterations, should be comparable to number of samples for best results
+   iteration = len(data)
+   
+   
+   #train som
+   som = MiniSom(5, 5, pixels, sigma=0.5, learning_rate=0.5)
+   som.random_weights_init(data)
+   som.train_random(data, iteration)
+   
+   #plt.pcolor(som.distance_map().T, cmap='bone_r')
+   
+   #show some results
+   
+   print("results for fake data\n")
+   
+   plt.figure(figsize=(8, 7))
+   frequencies = som.activation_response(data)
+   plt.pcolor(frequencies.T, cmap='Blues') 
+   plt.colorbar()
+   plt.show()
+   
+   act = som.activation_response(data)
+   #print(act)
+   
+   #print(som.quantization_error(data))
+   
+   #print(som.topographic_error(data))
+   
+   #print(som.winner(data[1]))
+   #som.labels_map(data, legend_fake)
+   results = []
+   size = len(data)
+   
+   for i in range(0,size):
+      results.append(som.winner(data[i]))
+
+   pairs = []
+   for i in range(0, size):
+      pairs.append([])
+      for j in range(0, size):
+         if results[i]==results[j]:
+            pairs[i].append(j)
+
+   return pairs
+
+def combined_data():
+   data = all_list
+   
+   #parameter for som training is number of iterations, should be comparable to number of samples for best results
+   iteration = len(data)
+   #train som
+   som = MiniSom(5, 5, pixels, sigma=0.5, learning_rate=0.5)
+   som.random_weights_init(data)
+   som.train_random(data, iteration)
+   
+   #plt.pcolor(som.distance_map().T, cmap='bone_r')
+   
+   #show some results
+   
+   print("results for combined data\n")
+   
+   plt.figure(figsize=(8, 7))
+   frequencies = som.activation_response(data)
+   plt.pcolor(frequencies.T, cmap='Blues') 
+   plt.colorbar()
+   plt.show()
+   
+   act = som.activation_response(data)
+   #print(act)
+   
+   #print(som.quantization_error(data))
+   
+   #print(som.topographic_error(data))
+   
+   #print(som.winner(data[1]))
+   
+   results = []
+   
+   for i in range(0,iteration):
+      results.append(som.winner(data[i]))
+
+   pairs = []
+   for i in range(0, iteration):
+      pairs.append([])
+      for j in range(0, iteration):
+         if results[i]==results[j]:
+            pairs[i].append(j)
+
+   return pairs
+
+def compare(real, fake):
+   print("here")
+   metric = 0
+   
+   return metric
+
+   
+read_data() 
+   
 #domain B
 fake = np.array(fake_list)
 #print(legend_fake)
 #print(len(legend_fake))
 #print(fake.shape)
-
+   
 #domain A
 real = np.array(real_list)
 #print(legend_real)
 #print(len(legend_real))
 #print(real.shape)
-
+   
 #combined dataset
 images = []
 images.extend(fake_list)
 images.extend(real_list)
 all_list = np.array(images)
-
+   
 legend = []
 legend.extend(legend_fake)
 legend.extend(legend_real)
@@ -85,30 +243,26 @@ legend.extend(legend_real)
 pixels = len(fake[1])
 #print(pixels)
 
-#set on which data to train on here
-data = all_list
+iteration = 100
 
-#parameter for som training is number of iterations, should be comparable to number of samples for best results
-iteration = len(data)
-  
-#train som
-som = MiniSom(10, 10, pixels, sigma=0.5, learning_rate=0.5)
-som.random_weights_init(data)
-som.train_random(data, iteration)
+groups_real = real_data()
+groups_fake = fake_data()
 
-#plt.pcolor(som.distance_map().T, cmap='bone_r')
+print(compare(groups_real, groups_fake))
 
-#show some results
+res = combined_data()
 
-plt.figure(figsize=(8, 7))
-frequencies = som.activation_response(data)
-plt.pcolor(frequencies.T, cmap='Blues') 
-plt.colorbar()
-plt.show()
+size = len(res)
 
-act = som.activation_response(data)
-print(act)
+sum = 0
+for i in range(0, int(size/2)):
+   if int(i+50) in res[i]:
+      sum = sum + 1
+      
+print(str(sum) +  " pairs were grouped together out of " + str(size))
+         
+         
 
-print(som.quantization_error(data))
 
-#print(som.win_map(data))
+
+   
