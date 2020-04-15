@@ -2,10 +2,12 @@
 
 MiniSOM references:
 https://github.com/JustGlowing/minisom
+
 https://heartbeat.fritz.ai/introduction-to-self-organizing-maps-soms-98e88b568f5d
 
 GAN resources:
 https://colab.research.google.com/github/junyanz/pytorch-CycleGAN-and-pix2pix/blob/master/CycleGAN.ipynb#scrollTo=LLO2CxcVgS0w
+
 https://github.com/junyanz/pytorch-CycleGAN-and-pix2pix
 
 the som-test.py currently reads in the horse2zebra testA dataset (50 input real, 50 output of GAN fake).
